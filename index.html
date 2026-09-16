@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Cloud Store</title>
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* TEXT UNSELECTABLE GLOBALLY */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-user-select: none; user-select: none; 
+        }
+        input { -webkit-user-select: text; user-select: text; }
+
+        /* 🔥 MOBILE BROWSER FIX: Buttons niche chhupne se bachane ke liye 🔥 */
+        html { height: -webkit-fill-available; }
+        body { 
+            background-color: #050505; color: #fff; 
+            display: flex; justify-content: center; 
+            height: 100vh; 
+            height: 100dvh; /* Dynamic Viewport - Adjusts to mobile browser bar */
+            min-height: -webkit-fill-available; 
+            overflow: hidden; 
+            margin: 0; 
+        }
+        
+        /* Liquid Background Blobs */
+        .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 12s infinite alternate ease-in-out; }
+        .blob-1 { width: 320px; height: 320px; background: #ff2a85; top: -100px; left: -100px; }
+        .blob-2 { width: 280px; height: 280px; background: #5e5ce6; bottom: -50px; right: -50px; animation-delay: -3s; }
+        .blob-3 { width: 220px; height: 220px; background: #0a84ff; top: 30%; left: 25%; animation-delay: -6s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 40px) scale(1.1); } }
+        
+        .app-container { width: 100%; max-width: 430px; height: 100%; position: relative; z-index: 10; display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
+        /* Top Header */
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; padding-top: 40px; gap: 12px; position: sticky; top: 0; z-index: 20; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); }
+        .icon-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn svg { fill: #fff; width: 20px; height: 20px; }
+        
+        /* Search */
+        .search-bar { flex: 1; height: 44px; padding: 0 16px; border-radius: 22px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font-size: 14px; font-weight: 500; outline: none; transition: background 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .search-bar::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .search-bar:focus { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
+
+        /* Screens */
+        .screen { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 10px 20px 120px 20px; }
+        .screen.active { display: flex; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Grid */
+        .grid-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
+        .grid-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; position: relative; cursor: pointer; }
+        
+        /* 2. ULTRA 3D PREMIUM LIQUID ICONS (With Highlight Shine) */
+        .item-icon { 
+            width: 70px; height: 70px; border-radius: 24%; object-fit: cover; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.6);
+            border-left: 1.5px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.8);
+            border-right: 1.5px solid rgba(0, 0, 0, 0.5);
+            box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6);   
+            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; 
+            color: rgba(255,255,255,0.9); font-size: 30px; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative; overflow: hidden;
+        }
+        
+        .item-icon-inner { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); width: 50%; height: 50%; }
+        .item-icon::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-25deg); animation: shine 5s infinite; }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        .grid-item:active .item-icon { transform: scale(0.9) translateY(5px); box-shadow: 5px 5px 15px rgba(0,0,0,0.8), inset 2px 2px 5px rgba(255, 255, 255, 0.4); }
+        .item-name { font-size: 11.5px; font-weight: 700; color: #f8f8f8; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 3px 6px rgba(0,0,0,0.8); letter-spacing: 0.3px;}
+
+        /* Bottom Nav */
+        .bottom-nav { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; height: 70px; background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; display: flex; justify-content: space-evenly; align-items: center; z-index: 20; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); border-top: 1px solid rgba(255,255,255,0.25); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.3s; width: 60px; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active svg { fill: #fff; transform: translateY(-2px); filter: drop-shadow(0 2px 5px rgba(255,255,255,0.4));}
+        .nav-icon { width: 22px; height: 22px; fill: rgba(255, 255, 255, 0.4); transition: all 0.3s; }
+        .empty-state { grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); margin-top: 50px; font-weight: 600; }
+
+        /* MODALS (MENU, PROFILE, ALERT, APP DETAILS) */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-box { background: rgba(30, 30, 30, 0.5); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 28px; padding: 25px; width: 100%; box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 2px 2px 5px rgba(255,255,255,0.1); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+        .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; text-align: center; letter-spacing: 0.5px; }
+
+        /* MENU ITEMS */
+        .menu-item { padding: 12px 16px; border-radius: 20px; background: rgba(255,255,255,0.03); margin-bottom: 12px; display: flex; align-items: center; gap: 15px; font-weight: 600; font-size: 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .menu-item:active { background: rgba(255,255,255,0.08); transform: scale(0.97); }
+        .menu-icon-glass { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.02) 100%); border-top: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.4); flex-shrink: 0; }
+        .menu-icon-glass svg { width: 18px; height: 18px; fill: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+
+        /* Auth UI */
+        .auth-tabs { display: flex; background: rgba(0,0,0,0.5); border-radius: 16px; margin-bottom: 25px; padding: 5px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6); }
+        .auth-tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 12px; color: rgba(255,255,255,0.4); transition: 0.3s; }
+        .auth-tab.active { background: rgba(255,255,255,0.15); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.1); }
+        .auth-form { display: none; flex-direction: column; gap: 16px; }
+        .auth-form.active { display: flex; }
+        .auth-input { padding: 16px 18px; border-radius: 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 15px; outline: none; font-weight: 500; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5); transition: 0.2s; }
+        .auth-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); }
+        
+        .auth-btn { padding: 16px; border-radius: 18px; background: linear-gradient(135deg, rgba(10, 132, 255, 0.7) 0%, rgba(94, 92, 230, 0.7) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 25px rgba(10, 132, 255, 0.4), inset 2px 2px 6px rgba(255,255,255,0.3); letter-spacing: 0.5px; text-decoration: none; text-align: center; display: block; border: none;}
+        .auth-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(10, 132, 255, 0.3), inset 1px 1px 3px rgba(255,255,255,0.2); }
+        .forgot-link { text-align: right; font-size: 13px; color: #0a84ff; cursor: pointer; margin-top: -8px; font-weight: 600; }
+
+        /* APP DETAILS MODAL */
+        .app-detail-header { background: rgba(0,0,0,0.2); margin: -25px -25px 20px -25px; padding: 30px 25px; border-radius: 28px 28px 0 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .rating-stars { color: #f5b041; font-size: 14px; margin-top: 8px; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .detail-heading { font-size: 13px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+        .detail-text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 25px; font-weight: 500; }
+        .close-btn-top { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; cursor: pointer; z-index: 10; border: 1px solid rgba(255,255,255,0.2);}
+        
+        /* PASSWORD BOX IN DETAILS */
+        .password-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; margin-bottom: 20px; cursor: pointer; text-align: center; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        .password-box:active { transform: scale(0.97); background: rgba(255,255,255,0.05); }
+
+        /* CUSTOM ALERT POPUP */
+        #customAlert { z-index: 200; } 
+        #customAlert .modal-box { max-width: 320px; text-align: center; }
+        .alert-heading { font-size: 24px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .alert-body { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 500; line-height: 1.5; margin-bottom: 25px; }
+        .alert-ok-btn { width: 100%; padding: 14px; border-radius: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .alert-ok-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.15); }
+
+        /* COPY TOAST */
+        #toastMessage { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(50px); opacity: 0; background: rgba(0,210,255,0.9); color: #000; padding: 10px 25px; border-radius: 20px; font-weight: 700; z-index: 1000; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; box-shadow: 0 5px 15px rgba(0,210,255,0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Header -->
+        <div class="top-header">
+            <div class="icon-btn" onclick="openMenuModal()">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </div>
+            <input type="text" id="globalSearch" class="search-bar" placeholder="Search apps, files..." autocomplete="off">
+            <div class="icon-btn" onclick="openProfileModal()">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+        </div>
+
+        <!-- Screens -->
+        <div id="allScreen" class="screen active"><div id="allList" class="grid-list"></div></div>
+        <div id="appsScreen" class="screen"><div id="appsList" class="grid-list"></div></div>
+        <div id="filesScreen" class="screen"><div id="filesList" class="grid-list"></div></div>
+
+        <!-- Bottom Dock -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.switchTab('all')">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+                <span>All</span>
+            </div>
+            <div class="nav-item" onclick="window.switchTab('apps')">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm2 4h12v10H6zm3 2v6h6v-6z"/></svg>
+                <span>Apps</span>
+            </div>
+            <div class="nav-item" onclick="window.switchTab('files')">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                <span>Files</span>
+            </div>
+        </div>
+
+        <!-- APP DETAILS MODAL -->
+        <div id="appDetailsModal" class="modal-overlay" onclick="closeModals()">
+            <div class="modal-box" style="position: relative;" onclick="event.stopPropagation()">
+                <div class="close-btn-top" onclick="closeModals()">✕</div>
+                
+                <div class="app-detail-header">
+                    <div id="detailIconWrapper" class="item-icon" style="width: 85px; height: 85px; font-size: 38px; margin: 0 auto 15px auto;"></div>
+                    <h2 id="detailTitle" style="font-weight: 800; font-size: 22px; letter-spacing: 0.5px;">App Name</h2>
+                    <div class="rating-stars">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span style="color: rgba(255,255,255,0.3)">★</span>
+                        <span style="color: #fff; margin-left: 5px;">4.8</span>
+                    </div>
+                </div>
+
+                <div>
+                    <!-- PASSWORD BOX -->
+                    <div id="detailPasswordBox" class="password-box" onclick="copyPassword()">
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px;">File Password</div>
+                        <div id="detailPasswordText" style="font-size: 18px; font-weight: 800; color: #00d2ff; letter-spacing: 1.5px;">12345</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 6px;">Tap to copy password</div>
+                    </div>
+
+                    <div class="detail-heading">About This Item</div>
+                    <div id="detailAbout" class="detail-text"></div>
+                    
+                    <button id="detailDownloadBtn" class="auth-btn">Download Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU MODAL -->
+        <div id="menuModal" class="modal-overlay" onclick="closeModals()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-title">Settings</div>
+                
+                <div class="menu-item" onclick="showAboutAlert()">
+                    <div class="menu-icon-glass"><svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg></div>
+                    About App
+                </div>
+                
+                <div class="menu-item" onclick="showUpdateAlert()">
+                    <div class="menu-icon-glass"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+                    Check for Updates
+                </div>
+                
+                <div class="menu-item" onclick="showNoticeAlert()">
+                    <div class="menu-icon-glass"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg></div>
+                    Notice Board
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE / AUTH MODAL -->
+        <div id="profileModal" class="modal-overlay" onclick="closeModals()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-title" id="authModalTitle">Account</div>
+                
+                <!-- If User Not Logged In -->
+                <div id="authContainer">
+                    <div class="auth-tabs" id="authTabHeader">
+                        <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+                        <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+                    </div>
+                    <!-- Login -->
+                    <div id="form-login" class="auth-form active">
+                        <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
+                        <input type="password" id="loginPass" class="auth-input" placeholder="Password">
+                        <div style="text-align: right; font-size: 13px; color: #00d2ff; cursor: pointer; margin-top: -8px; font-weight: 600;" onclick="switchAuthTab('forgot')">Forgot Password?</div>
+                        <button class="auth-btn" onclick="userLogin()">Log In</button>
+                    </div>
+                    <!-- Signup -->
+                    <div id="form-signup" class="auth-form">
+                        <input type="text" id="signupName" class="auth-input" placeholder="Full Name">
+                        <input type="email" id="signupEmail" class="auth-input" placeholder="Email Address">
+                        <input type="password" id="signupPass" class="auth-input" placeholder="Create Password">
+                        <button class="auth-btn" onclick="userSignUp()">Create Account</button>
+                    </div>
+                    <!-- Forgot Password -->
+                    <div id="form-forgot" class="auth-form">
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-top:-10px;">Enter your email to reset password.</p>
+                        <input type="email" id="forgotEmail" class="auth-input" placeholder="Email Address">
+                        <button class="auth-btn" onclick="userForgotPassword()">Send Reset Link</button>
+                        <div style="text-align: center; margin-top: 10px; font-size: 13px; color: #00d2ff; cursor: pointer; font-weight: 600;" onclick="switchAuthTab('login')">Back to Login</div>
+                    </div>
+                </div>
+
+                <!-- If User IS Logged In -->
+                <div id="loggedInContainer" style="display: none; text-align: center;">
+                    <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
+                    <h3 id="displayUserName" style="margin-bottom: 5px; font-weight: 800;">User</h3>
+                    <p id="displayUserEmail" style="color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 25px;"></p>
+                    <button class="auth-btn" style="background: linear-gradient(135deg, #ff453a, #ff1a1a); box-shadow: 0 8px 25px rgba(255, 69, 58, 0.4);" onclick="userLogout()">Log Out</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CUSTOM ALERT POPUP -->
+        <div id="customAlert" class="modal-overlay" onclick="closeCustomAlert()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="alert-heading" id="alertTitle">Title</div>
+                <div class="alert-body" id="alertMessage">Message goes here.</div>
+                <button class="alert-ok-btn" onclick="closeCustomAlert()">Got it</button>
+            </div>
+        </div>
+
+        <!-- TOAST MESSAGE -->
+        <div id="toastMessage">Copied!</div>
+
+    </div>
+
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9qpohU70nl5M5vdioQCo9WBWiRbwKBkU",
+            authDomain: "app-store-b41fd.firebaseapp.com",
+            projectId: "app-store-b41fd",
+            storageBucket: "app-store-b41fd.firebasestorage.app",
+            messagingSenderId: "17280874591",
+            appId: "1:17280874591:web:f78312ebb917c0d01a43ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        window.allItems = [];
+        window.globalSettings = { about: '', update: '', notice: '' };
+        
+        window.isUserLoggedIn = false;
+        window.currentPasswordToCopy = "";
+
+        // LISTEN FOR GLOBAL SETTINGS
+        onSnapshot(doc(db, "settings", "global"), (docSnap) => {
+            if(docSnap.exists()) { window.globalSettings = docSnap.data(); }
+        });
+
+        // LISTEN FOR STORE ITEMS
+        onSnapshot(collection(db, "storeItems"), (snapshot) => {
+            window.allItems = [];
+            snapshot.forEach((doc) => {
+                window.allItems.push({ id: doc.id, ...doc.data() });
+            });
+            // Sort to show newest first
+            window.allItems.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+            renderData(); 
+        });
+
+        // AUTH STATE LISTENER
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.isUserLoggedIn = true;
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('loggedInContainer').style.display = 'block';
+                document.getElementById('displayUserName').innerText = user.displayName || "Cloud User";
+                document.getElementById('displayUserEmail').innerText = user.email;
+            } else {
+                window.isUserLoggedIn = false;
+                document.getElementById('authContainer').style.display = 'block';
+                document.getElementById('loggedInContainer').style.display = 'none';
+            }
+        });
+
+        // ---------------- RENDERING ----------------
+        function renderData(query = '') {
+            const allContainer = document.getElementById('allList');
+            const appsContainer = document.getElementById('appsList');
+            const filesContainer = document.getElementById('filesList');
+            
+            allContainer.innerHTML = ''; appsContainer.innerHTML = ''; filesContainer.innerHTML = '';
+            const filtered = window.allItems.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+            
+            let allCount = 0; let appsCount = 0; let filesCount = 0;
+
+            filtered.forEach(item => {
+                const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner" style="width:50%; height:50%;">` : `<span class="item-icon-inner">${item.category === 'app' ? '📱' : '📁'}</span>`;
+                
+                const html = `
+                    <div class="grid-item" onclick="openAppDetails('${item.id}')">
+                        <div class="item-icon">${iconHtml}</div>
+                        <div class="item-name">${item.name}</div>
+                    </div>
+                `;
+                
+                allContainer.innerHTML += html; allCount++;
+                if(item.category === 'app') { appsContainer.innerHTML += html; appsCount++; }
+                else { filesContainer.innerHTML += html; filesCount++; }
+            });
+
+            if(allCount === 0) allContainer.innerHTML = `<div class="empty-state">No items available.</div>`;
+            if(appsCount === 0) appsContainer.innerHTML = `<div class="empty-state">No apps available.</div>`;
+            if(filesCount === 0) filesContainer.innerHTML = `<div class="empty-state">No files available.</div>`;
+        }
+
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            renderData(e.target.value);
+        });
+
+        // ---------------- DOWNLOAD LOGIC ----------------
+        window.triggerSilentDownload = async function(url, itemId) {
+            try {
+                const item = window.allItems.find(i => i.id === itemId);
+                if(item) {
+                    await updateDoc(doc(db, "storeItems", itemId), { downloads: (item.downloads || 0) + 1 });
+                }
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_self'; 
+                a.download = '';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                showCustomAlert('Downloading...', 'Your download is starting. Please wait.');
+            } catch (error) {
+                console.error("Error updating download count:", error);
+            }
+        }
+
+        // ---------------- MODALS & TABS ----------------
+        window.switchTab = function(tab) {
+            document.getElementById('allScreen').classList.remove('active');
+            document.getElementById('appsScreen').classList.remove('active');
+            document.getElementById('filesScreen').classList.remove('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            if(tab === 'all') {
+                document.getElementById('allScreen').classList.add('active');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if(tab === 'apps') {
+                document.getElementById('appsScreen').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if(tab === 'files') {
+                document.getElementById('filesScreen').classList.add('active');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            }
+        };
+
+        window.openAppDetails = function(id) {
+            const item = window.allItems.find(i => i.id === id);
+            if(!item) return;
+
+            document.getElementById('detailTitle').innerText = item.name;
+            const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner" style="width:50%; height:50%;">` : `<span class="item-icon-inner">${item.category === 'app' ? '📱' : '📁'}</span>`;
+            document.getElementById('detailIconWrapper').innerHTML = iconHtml;
+            
+            const aboutText = item.category === 'app' 
+                ? `Premium secure application optimized for your device.`
+                : `High quality secure file/document stored safely in the cloud.`;
+            document.getElementById('detailAbout').innerText = aboutText;
+
+            if(item.password) {
+                document.getElementById('detailPasswordBox').style.display = 'block';
+                document.getElementById('detailPasswordText').innerText = item.password;
+                window.currentPasswordToCopy = item.password;
+            } else {
+                document.getElementById('detailPasswordBox').style.display = 'none';
+                window.currentPasswordToCopy = "";
+            }
+
+            const downloadBtn = document.getElementById('detailDownloadBtn');
+            if(item.visibility === 'private') {
+                downloadBtn.innerHTML = '🔒 Download (Private)';
+                downloadBtn.onclick = function() {
+                    if(!window.isUserLoggedIn) {
+                        showCustomAlert('Access Denied', 'This is a private file. Please login to download it.');
+                    } else {
+                        window.triggerSilentDownload(item.link, item.id);
+                    }
+                };
+            } else {
+                downloadBtn.innerHTML = 'Download Now';
+                downloadBtn.onclick = function() {
+                    window.triggerSilentDownload(item.link, item.id);
+                };
+            }
+
+            closeModals();
+            document.getElementById('appDetailsModal').classList.add('show');
+        }
+
+        window.copyPassword = function() {
+            if(window.currentPasswordToCopy) {
+                navigator.clipboard.writeText(window.currentPasswordToCopy).then(() => {
+                    const toast = document.getElementById('toastMessage');
+                    toast.style.transform = 'translateX(-50%) translateY(0)';
+                    toast.style.opacity = '1';
+                    setTimeout(() => {
+                        toast.style.transform = 'translateX(-50%) translateY(50px)';
+                        toast.style.opacity = '0';
+                    }, 2000);
+                });
+            }
+        }
+
+        window.openMenuModal = function() { document.getElementById('menuModal').classList.add('show'); }
+        window.openProfileModal = function() { document.getElementById('profileModal').classList.add('show'); switchAuthTab('login'); }
+        
+        window.closeModals = function() { 
+            document.getElementById('menuModal').classList.remove('show'); 
+            document.getElementById('profileModal').classList.remove('show'); 
+            document.getElementById('appDetailsModal').classList.remove('show');
+        }
+
+        window.showCustomAlert = function(title, message) {
+            closeModals(); 
+            document.getElementById('alertTitle').innerHTML = title;
+            document.getElementById('alertMessage').innerHTML = message;
+            document.getElementById('customAlert').classList.add('show');
+        }
+        window.closeCustomAlert = function() { document.getElementById('customAlert').classList.remove('show'); }
+
+        // Dynamic Alerts for Menu
+        window.showAboutAlert = function() {
+            const text = window.globalSettings.about || "Version 1.0.0<br><br>Developed with extreme precision and premium UI by RVG.";
+            showCustomAlert('About App', text);
+        }
+        window.showUpdateAlert = function() {
+            const text = window.globalSettings.update || "Checking server...<br><br>You are currently using the latest version of the app.";
+            showCustomAlert('Check for Updates', text);
+        }
+        window.showNoticeAlert = function() {
+            const text = window.globalSettings.notice || "Welcome to My Cloud Store.<br><br>No new notifications at this moment. Stay tuned!";
+            showCustomAlert('Notice Board', text);
+        }
+
+        // ---------------- AUTHENTICATION LOGIC ----------------
+        window.switchAuthTab = function(tab) {
+            document.getElementById('form-login').classList.remove('active');
+            document.getElementById('form-signup').classList.remove('active');
+            document.getElementById('form-forgot').classList.remove('active');
+            
+            const tabs = document.querySelectorAll('.auth-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if(tab === 'login') {
+                document.getElementById('form-login').classList.add('active');
+                document.getElementById('authTabHeader').style.display = 'flex';
+                tabs[0].classList.add('active');
+            } else if(tab === 'signup') {
+                document.getElementById('form-signup').classList.add('active');
+                document.getElementById('authTabHeader').style.display = 'flex';
+                tabs[1].classList.add('active');
+            } else if(tab === 'forgot') {
+                document.getElementById('form-forgot').classList.add('active');
+                document.getElementById('authTabHeader').style.display = 'none';
+            }
+        }
+
+        window.userSignUp = async function() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const pass = document.getElementById('signupPass').value.trim();
+            if(!name || !email || !pass) return showCustomAlert("Error", "All fields are required.");
+            
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", userCred.user.uid), {
+                    name: name, email: email, createdAt: Date.now()
+                });
+                showCustomAlert("Welcome!", "Account created successfully.");
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPass').value = '';
+            } catch(e) { showCustomAlert("Error", e.message); }
+        }
+
+        window.userLogin = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            if(!email || !pass) return showCustomAlert("Error", "Enter email and password.");
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                closeModals();
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPass').value = '';
+            } catch(e) { showCustomAlert("Error", e.message); }
+        }
+
+        window.userForgotPassword = async function() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            if(!email) return showCustomAlert("Error", "Please enter your email address.");
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showCustomAlert("Email Sent", "Password reset link has been sent to your email.");
+                document.getElementById('forgotEmail').value = '';
+            } catch(e) { showCustomAlert("Error", e.message); }
+        }
+
+        window.userLogout = async function() {
+            try {
+                await signOut(auth);
+                closeModals();
+            } catch(e) { showCustomAlert("Error", e.message); }
+        }
+
+    </script>
+</body>
+  </html>
