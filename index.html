@@ -7,12 +7,22 @@
     <!-- Premium Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* TEXT UNSELECTABLE GLOBALLY */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
         input { -webkit-user-select: text; user-select: text; }
 
         html { height: -webkit-fill-available; }
         body { background-color: #050505; color: #fff; display: flex; justify-content: center; height: 100vh; height: 100dvh; min-height: -webkit-fill-available; overflow: hidden; margin: 0; }
         
+        /* 🌟 LOADER STYLES 🌟 */
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.6s; }
+        .loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(1.05); }
+        .loader-spinner { width: 65px; height: 65px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.05); border-top-color: #00d2ff; border-right-color: #3a7bd5; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite, glow 2s alternate infinite; margin-bottom: 25px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes glow { 0% { box-shadow: 0 0 10px rgba(0, 210, 255, 0.2), inset 0 0 10px rgba(0, 210, 255, 0.2); } 100% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.8), inset 0 0 20px rgba(0, 210, 255, 0.5); } }
+        .loader-text { font-size: 15px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: pulseText 1.5s infinite; text-transform: uppercase; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
         .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 12s infinite alternate ease-in-out; }
         .blob-1 { width: 320px; height: 320px; background: #ff2a85; top: -100px; left: -100px; }
@@ -22,6 +32,7 @@
         
         .app-container { width: 100%; max-width: 430px; height: 100%; position: relative; z-index: 10; display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         
+        /* Top Header */
         .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; padding-top: 40px; gap: 12px; position: sticky; top: 0; z-index: 20; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); }
         .icon-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .icon-btn:active { transform: scale(0.9); }
@@ -38,30 +49,21 @@
         .grid-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; position: relative; cursor: pointer; }
         
-        .item-icon { 
-            width: 70px; height: 70px; border-radius: 24%; object-fit: cover; 
-            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%);
-            backdrop-filter: blur(25px); 
-            border-top: 1.5px solid rgba(255, 255, 255, 0.6); border-left: 1.5px solid rgba(255, 255, 255, 0.4);
-            border-bottom: 1.5px solid rgba(0, 0, 0, 0.8); border-right: 1.5px solid rgba(0, 0, 0, 0.5);
-            box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6);   
-            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; 
-            color: rgba(255,255,255,0.9); font-size: 30px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
-        }
-        
+        .item-icon { width: 70px; height: 70px; border-radius: 24%; object-fit: cover; background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%); backdrop-filter: blur(25px); border-top: 1.5px solid rgba(255, 255, 255, 0.6); border-left: 1.5px solid rgba(255, 255, 255, 0.4); border-bottom: 1.5px solid rgba(0, 0, 0, 0.8); border-right: 1.5px solid rgba(0, 0, 0, 0.5); box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.9); font-size: 30px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
         .item-icon-inner { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); width: 50%; height: 50%; }
         .item-icon::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-25deg); animation: shine 5s infinite; }
-        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        
         .grid-item:active .item-icon { transform: scale(0.9) translateY(5px); box-shadow: 5px 5px 15px rgba(0,0,0,0.8), inset 2px 2px 5px rgba(255, 255, 255, 0.4); }
         .item-name { font-size: 11.5px; font-weight: 700; color: #f8f8f8; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 3px 6px rgba(0,0,0,0.8); }
 
-        .bottom-nav { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; height: 70px; background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; display: flex; justify-content: space-evenly; align-items: center; z-index: 20; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); border-top: 1px solid rgba(255,255,255,0.25); }
+        .bottom-nav { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; height: 70px; background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; display: flex; justify-content: space-evenly; align-items: center; z-index: 20; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.3s; width: 60px; }
         .nav-item.active { color: #fff; }
         .nav-item.active svg { fill: #fff; transform: translateY(-2px); filter: drop-shadow(0 2px 5px rgba(255,255,255,0.4));}
         .nav-icon { width: 22px; height: 22px; fill: rgba(255, 255, 255, 0.4); transition: all 0.3s; }
         .empty-state { grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); margin-top: 50px; font-weight: 600; }
 
+        /* MODALS */
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
         .modal-box { background: rgba(30, 30, 30, 0.5); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 28px; padding: 25px; width: 100%; box-shadow: 0 25px 60px rgba(0,0,0,0.8); transform: translateY(20px) scale(0.95); transition: all 0.3s; max-height: 85vh; overflow-y: auto; }
@@ -73,6 +75,7 @@
         .menu-icon-glass { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.02) 100%); border-top: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.4); flex-shrink: 0; }
         .menu-icon-glass svg { width: 18px; height: 18px; fill: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
 
+        /* Auth UI */
         .auth-tabs { display: flex; background: rgba(0,0,0,0.5); border-radius: 16px; margin-bottom: 25px; padding: 5px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6); }
         .auth-tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 12px; color: rgba(255,255,255,0.4); transition: 0.3s; }
         .auth-tab.active { background: rgba(255,255,255,0.15); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -83,6 +86,10 @@
         
         .auth-btn { padding: 16px; border-radius: 18px; background: linear-gradient(135deg, #10b981, #059669); border-top: 1px solid rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); letter-spacing: 0.5px; text-decoration: none; text-align: center; display: block; border: none; width: 100%;}
         .auth-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+
+        /* Profile User Card */
+        .profile-card { background: rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 25px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.4); }
+        .profile-avatar { width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.3); margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         
         .app-detail-header { background: rgba(0,0,0,0.2); margin: -25px -25px 20px -25px; padding: 30px 25px; border-radius: 28px 28px 0 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .rating-stars { color: #f5b041; font-size: 14px; margin-top: 8px; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -104,6 +111,12 @@
     </style>
 </head>
 <body>
+
+    <!-- 🌟 LOADER OVERLAY 🌟 -->
+    <div id="loaderOverlay" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading Store...</div>
+    </div>
 
     <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
 
@@ -157,23 +170,69 @@
             </div>
         </div>
 
-        <!-- PROFILE MODAL -->
+        <!-- PROFILE MODAL (PREMIUM UI WITH PASSWORD CHANGE & DELETE) -->
         <div id="profileModal" class="modal-overlay" onclick="closeModals()">
             <div class="modal-box" onclick="event.stopPropagation()">
                 <div class="modal-title" id="authModalTitle">Account</div>
+                
+                <!-- If User Not Logged In -->
                 <div id="authContainer">
                     <div class="auth-tabs" id="authTabHeader"><div class="auth-tab active" onclick="switchAuthTab('login')">Login</div><div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div></div>
-                    <div id="form-login" class="auth-form active"><input type="email" id="loginEmail" class="auth-input" placeholder="Email Address"><input type="password" id="loginPass" class="auth-input" placeholder="Password"><div style="text-align: right; font-size: 13px; color: #00d2ff; cursor: pointer; margin-top: -8px; font-weight: 600;" onclick="switchAuthTab('forgot')">Forgot Password?</div><button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6);" onclick="userLogin()">Log In</button></div>
-                    <div id="form-signup" class="auth-form"><input type="text" id="signupName" class="auth-input" placeholder="Full Name"><input type="email" id="signupEmail" class="auth-input" placeholder="Email Address"><input type="password" id="signupPass" class="auth-input" placeholder="Create Password"><button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6);" onclick="userSignUp()">Create Account</button></div>
-                    <div id="form-forgot" class="auth-form"><p style="font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-top:-10px;">Enter your email to reset password.</p><input type="email" id="forgotEmail" class="auth-input" placeholder="Email Address"><button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6);" onclick="userForgotPassword()">Send Reset Link</button><div style="text-align: center; margin-top: 10px; font-size: 13px; color: #00d2ff; cursor: pointer; font-weight: 600;" onclick="switchAuthTab('login')">Back to Login</div></div>
+                    
+                    <div id="form-login" class="auth-form active">
+                        <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
+                        <input type="password" id="loginPass" class="auth-input" placeholder="Password">
+                        <div style="text-align: right; font-size: 13px; color: #00d2ff; cursor: pointer; margin-top: -8px; font-weight: 600;" onclick="switchAuthTab('forgot')">Forgot Password?</div>
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6); box-shadow: 0 8px 25px rgba(10, 132, 255, 0.4);" onclick="userLogin()">Log In</button>
+                    </div>
+                    
+                    <div id="form-signup" class="auth-form">
+                        <input type="text" id="signupName" class="auth-input" placeholder="Full Name">
+                        <!-- NEW DOB FIELD -->
+                        <input type="text" id="signupDob" class="auth-input" placeholder="Date of Birth" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                        <input type="email" id="signupEmail" class="auth-input" placeholder="Email Address">
+                        <input type="password" id="signupPass" class="auth-input" placeholder="Create Password">
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6); box-shadow: 0 8px 25px rgba(10, 132, 255, 0.4);" onclick="userSignUp()">Create Account</button>
+                    </div>
+                    
+                    <div id="form-forgot" class="auth-form">
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-top:-10px;">Enter your email to reset password.</p>
+                        <input type="email" id="forgotEmail" class="auth-input" placeholder="Email Address">
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6); box-shadow: 0 8px 25px rgba(10, 132, 255, 0.4);" onclick="userForgotPassword()">Send Reset Link</button>
+                        <div style="text-align: center; margin-top: 10px; font-size: 13px; color: #00d2ff; cursor: pointer; font-weight: 600;" onclick="switchAuthTab('login')">Back to Login</div>
+                    </div>
                 </div>
-                <div id="loggedInContainer" style="display: none; text-align: center;">
-                    <div style="font-size: 50px; margin-bottom: 10px;">👤</div><h3 id="displayUserName" style="margin-bottom: 5px; font-weight: 800;">User</h3><p id="displayUserEmail" style="color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 25px;"></p><button class="auth-btn" style="background: linear-gradient(135deg, #ff453a, #ff1a1a);" onclick="userLogout()">Log Out</button>
+
+                <!-- If User IS Logged In (PREMIUM PROFILE) -->
+                <div id="loggedInContainer" style="display: none; width: 100%;">
+                    
+                    <div class="profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <h3 id="displayUserName" style="margin-bottom: 5px; font-weight: 800; font-size: 20px;">User Name</h3>
+                        <p id="displayUserEmail" style="color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 5px; font-weight: 500;"></p>
+                        <p id="displayUserDob" style="font-size: 12px; color: #00d2ff; font-weight: 600;"></p>
+                    </div>
+
+                    <!-- Hidden Change Password Form -->
+                    <div id="changePassForm" style="display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                        <input type="password" id="newPasswordInput" class="auth-input" style="padding: 12px; font-size: 14px;" placeholder="Enter New Password">
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 12px; font-size: 14px;" onclick="confirmChangePassword()">Save Password</button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6); box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);" onclick="toggleChangePassword()">Change Password</button>
+                        <button class="auth-btn" style="background: linear-gradient(135deg, #ff9500, #ff5e3a); box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);" onclick="userLogout()">Log Out</button>
+                        <button class="auth-btn" style="background: rgba(255, 69, 58, 0.1); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a; box-shadow: none; font-size: 14px;" onclick="deleteUserAccount()">Delete Account</button>
+                    </div>
                 </div>
+
             </div>
         </div>
 
+        <!-- CUSTOM ALERT POPUP -->
         <div id="customAlert" class="modal-overlay" onclick="closeCustomAlert()"><div class="modal-box" onclick="event.stopPropagation()"><div class="alert-heading" id="alertTitle">Title</div><div class="alert-body" id="alertMessage">Message goes here.</div><button class="alert-ok-btn" onclick="closeCustomAlert()">Got it</button></div></div>
+        
+        <!-- TOAST MESSAGE -->
         <div id="toastMessage">Copied!</div>
 
     </div>
@@ -181,8 +240,8 @@
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD9qpohU70nl5M5vdioQCo9WBWiRbwKBkU",
@@ -200,22 +259,39 @@
         window.allItems = []; window.globalSettings = { about: '', update: '', notice: '' };
         window.isUserLoggedIn = false; window.currentPasswordToCopy = "";
 
+        // Settings Listener
         onSnapshot(doc(db, "settings", "global"), (docSnap) => { if(docSnap.exists()) window.globalSettings = docSnap.data(); });
 
+        // Store Items Listener + Remove Loader
         onSnapshot(collection(db, "storeItems"), (snapshot) => {
             window.allItems = [];
             snapshot.forEach((doc) => { window.allItems.push({ id: doc.id, ...doc.data() }); });
             window.allItems.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
             renderData(); 
+            
+            const loader = document.getElementById('loaderOverlay');
+            if(loader) { loader.classList.add('hidden'); }
         });
 
-        onAuthStateChanged(auth, (user) => {
+        // Auth State Listener
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.isUserLoggedIn = true;
                 document.getElementById('authContainer').style.display = 'none';
                 document.getElementById('loggedInContainer').style.display = 'block';
-                document.getElementById('displayUserName').innerText = "Store Member";
                 document.getElementById('displayUserEmail').innerText = user.email;
+                document.getElementById('changePassForm').style.display = 'none';
+                
+                // Fetch User Extra Data (Name, DOB)
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if(userDoc.exists()) {
+                        const ud = userDoc.data();
+                        document.getElementById('displayUserName').innerText = ud.name || "Cloud User";
+                        document.getElementById('displayUserDob').innerText = "DOB: " + (ud.dob ? new Date(ud.dob).toLocaleDateString('en-IN') : "Not provided");
+                    }
+                } catch(e) { console.log("Could not fetch user profile details."); }
+
             } else {
                 window.isUserLoggedIn = false;
                 document.getElementById('authContainer').style.display = 'block';
@@ -243,15 +319,11 @@
 
         document.getElementById('globalSearch').addEventListener('input', (e) => { renderData(e.target.value); });
 
-        // 🔥 FIXED: Direct Download Logic
-        window.triggerSilentDownload = function(url, itemId) {
-            // Browser popup blocker se bachne ke liye click hote hi window open karna zaroori hai
-            window.open(url, '_blank');
-            
-            // Uske baad background me count update karenge
+        window.triggerSilentDownload = async function(url, itemId) {
             try {
                 const item = window.allItems.find(i => i.id === itemId);
-                if(item) { updateDoc(doc(db, "storeItems", itemId), { downloads: (item.downloads || 0) + 1 }); }
+                if(item) { await updateDoc(doc(db, "storeItems", itemId), { downloads: (item.downloads || 0) + 1 }); }
+                window.open(url, '_blank');
             } catch (error) { console.error("Error:", error); }
         }
 
@@ -307,7 +379,13 @@
         window.openMenuModal = function() { document.getElementById('menuModal').classList.add('show'); }
         window.openProfileModal = function() { document.getElementById('profileModal').classList.add('show'); switchAuthTab('login'); }
         window.closeModals = function() { document.getElementById('menuModal').classList.remove('show'); document.getElementById('profileModal').classList.remove('show'); document.getElementById('appDetailsModal').classList.remove('show'); }
-        window.showCustomAlert = function(title, message) { closeModals(); document.getElementById('alertTitle').innerHTML = title; document.getElementById('alertMessage').innerHTML = message; document.getElementById('customAlert').classList.add('show'); }
+        
+        window.showCustomAlert = function(title, message) { 
+            closeModals(); 
+            document.getElementById('alertTitle').innerHTML = title; 
+            document.getElementById('alertMessage').innerHTML = message; 
+            document.getElementById('customAlert').classList.add('show'); 
+        }
         window.closeCustomAlert = function() { document.getElementById('customAlert').classList.remove('show'); }
 
         window.showAboutAlert = function() { showCustomAlert('About App', window.globalSettings.about || "Version 1.0.0<br><br>Developed with extreme precision and premium UI by RVG."); }
@@ -322,14 +400,24 @@
             else if(tab === 'forgot') { document.getElementById('form-forgot').classList.add('active'); document.getElementById('authTabHeader').style.display = 'none'; }
         }
 
+        // ---------------- ACCOUNT MANAGEMENT ----------------
+
         window.userSignUp = async function() {
-            const name = document.getElementById('signupName').value.trim(); const email = document.getElementById('signupEmail').value.trim(); const pass = document.getElementById('signupPass').value.trim();
-            if(!name || !email || !pass) return showCustomAlert("Error", "All fields are required.");
+            const name = document.getElementById('signupName').value.trim(); 
+            const dob = document.getElementById('signupDob').value.trim(); 
+            const email = document.getElementById('signupEmail').value.trim(); 
+            const pass = document.getElementById('signupPass').value.trim();
+            
+            if(!name || !email || !pass || !dob) return showCustomAlert("Error", "All fields including Date of Birth are required.");
+            
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", userCred.user.uid), { name: name, email: email, createdAt: Date.now() });
+                await setDoc(doc(db, "users", userCred.user.uid), { 
+                    name: name, dob: dob, email: email, createdAt: Date.now() 
+                });
                 showCustomAlert("Welcome!", "Account created successfully.");
-                document.getElementById('signupName').value = ''; document.getElementById('signupEmail').value = ''; document.getElementById('signupPass').value = '';
+                document.getElementById('signupName').value = ''; document.getElementById('signupDob').value = ''; 
+                document.getElementById('signupEmail').value = ''; document.getElementById('signupPass').value = '';
             } catch(e) { showCustomAlert("Error", e.message); }
         }
 
@@ -345,7 +433,50 @@
             try { await sendPasswordResetEmail(auth, email); showCustomAlert("Email Sent", "Password reset link has been sent to your email."); document.getElementById('forgotEmail').value = ''; } catch(e) { showCustomAlert("Error", e.message); }
         }
 
-        window.userLogout = async function() { try { await signOut(auth); closeModals(); } catch(e) { showCustomAlert("Error", e.message); } }
+        window.userLogout = async function() { 
+            try { await signOut(auth); closeModals(); } catch(e) { showCustomAlert("Error", e.message); } 
+        }
+
+        window.toggleChangePassword = function() {
+            const form = document.getElementById('changePassForm');
+            form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        window.confirmChangePassword = async function() {
+            const newPass = document.getElementById('newPasswordInput').value.trim();
+            if(!newPass || newPass.length < 6) return showCustomAlert("Error", "Password must be at least 6 characters.");
+            
+            try {
+                await updatePassword(auth.currentUser, newPass);
+                document.getElementById('newPasswordInput').value = '';
+                document.getElementById('changePassForm').style.display = 'none';
+                showCustomAlert("Success", "Your password has been changed successfully.");
+            } catch(error) {
+                if(error.code === 'auth/requires-recent-login') {
+                    showCustomAlert("Security Check", "Please log out and log in again to change your password.");
+                } else {
+                    showCustomAlert("Error", error.message);
+                }
+            }
+        }
+
+        window.deleteUserAccount = async function() {
+            if(confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
+                try {
+                    const user = auth.currentUser;
+                    await deleteDoc(doc(db, "users", user.uid)); // Delete from firestore
+                    await deleteUser(user); // Delete from Auth
+                    showCustomAlert("Account Deleted", "Your account has been permanently removed.");
+                    closeModals();
+                } catch(error) {
+                    if(error.code === 'auth/requires-recent-login') {
+                        showCustomAlert("Security Alert", "Please log out and log in again to delete your account.");
+                    } else {
+                        showCustomAlert("Error", error.message);
+                    }
+                }
+            }
+        }
 
     </script>
 </body>
