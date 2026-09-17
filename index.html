@@ -49,10 +49,29 @@
         .grid-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; position: relative; cursor: pointer; }
         
-        .item-icon { width: 70px; height: 70px; border-radius: 24%; object-fit: cover; background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%); backdrop-filter: blur(25px); border-top: 1.5px solid rgba(255, 255, 255, 0.6); border-left: 1.5px solid rgba(255, 255, 255, 0.4); border-bottom: 1.5px solid rgba(0, 0, 0, 0.8); border-right: 1.5px solid rgba(0, 0, 0, 0.5); box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.9); font-size: 30px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
-        .item-icon-inner { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); width: 50%; height: 50%; }
-        .item-icon::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-25deg); animation: shine 5s infinite; }
+        /* 🔥 FIXED: ULTRA 3D PREMIUM LIQUID ICONS (Super Highlight Shine) 🔥 */
+        .item-icon { 
+            width: 70px; height: 70px; border-radius: 24%; object-fit: cover; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.6); border-left: 1.5px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.8); border-right: 1.5px solid rgba(0, 0, 0, 0.5);
+            box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6);   
+            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; 
+            color: rgba(255,255,255,0.9); font-size: 30px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; 
+        }
         
+        .item-icon-inner { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); width: 50%; height: 50%; border-radius: 8px; object-fit: cover; }
+        
+        /* Using ::after with z-index so the shine passes OVER the image! */
+        .item-icon::after { 
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; 
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.7), transparent); 
+            transform: skewX(-25deg); animation: shine 4.5s infinite; 
+            z-index: 10; pointer-events: none; 
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
         .grid-item:active .item-icon { transform: scale(0.9) translateY(5px); box-shadow: 5px 5px 15px rgba(0,0,0,0.8), inset 2px 2px 5px rgba(255, 255, 255, 0.4); }
         .item-name { font-size: 11.5px; font-weight: 700; color: #f8f8f8; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 3px 6px rgba(0,0,0,0.8); }
 
@@ -75,7 +94,6 @@
         .menu-icon-glass { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.02) 100%); border-top: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.4); flex-shrink: 0; }
         .menu-icon-glass svg { width: 18px; height: 18px; fill: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
 
-        /* Auth UI */
         .auth-tabs { display: flex; background: rgba(0,0,0,0.5); border-radius: 16px; margin-bottom: 25px; padding: 5px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6); }
         .auth-tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 12px; color: rgba(255,255,255,0.4); transition: 0.3s; }
         .auth-tab.active { background: rgba(255,255,255,0.15); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -86,7 +104,7 @@
         
         .auth-btn { padding: 16px; border-radius: 18px; background: linear-gradient(135deg, #10b981, #059669); border-top: 1px solid rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.3); border-right: 1px solid rgba(0,0,0,0.3); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); letter-spacing: 0.5px; text-decoration: none; text-align: center; display: block; border: none; width: 100%;}
         .auth-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
-
+        
         /* Profile User Card */
         .profile-card { background: rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 25px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.4); }
         .profile-avatar { width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.3); margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
@@ -170,12 +188,11 @@
             </div>
         </div>
 
-        <!-- PROFILE MODAL (PREMIUM UI WITH PASSWORD CHANGE & DELETE) -->
+        <!-- PROFILE MODAL -->
         <div id="profileModal" class="modal-overlay" onclick="closeModals()">
             <div class="modal-box" onclick="event.stopPropagation()">
                 <div class="modal-title" id="authModalTitle">Account</div>
                 
-                <!-- If User Not Logged In -->
                 <div id="authContainer">
                     <div class="auth-tabs" id="authTabHeader"><div class="auth-tab active" onclick="switchAuthTab('login')">Login</div><div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div></div>
                     
@@ -188,7 +205,6 @@
                     
                     <div id="form-signup" class="auth-form">
                         <input type="text" id="signupName" class="auth-input" placeholder="Full Name">
-                        <!-- NEW DOB FIELD -->
                         <input type="text" id="signupDob" class="auth-input" placeholder="Date of Birth" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
                         <input type="email" id="signupEmail" class="auth-input" placeholder="Email Address">
                         <input type="password" id="signupPass" class="auth-input" placeholder="Create Password">
@@ -203,22 +219,17 @@
                     </div>
                 </div>
 
-                <!-- If User IS Logged In (PREMIUM PROFILE) -->
                 <div id="loggedInContainer" style="display: none; width: 100%;">
-                    
                     <div class="profile-card">
                         <div class="profile-avatar">👤</div>
                         <h3 id="displayUserName" style="margin-bottom: 5px; font-weight: 800; font-size: 20px;">User Name</h3>
                         <p id="displayUserEmail" style="color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 5px; font-weight: 500;"></p>
                         <p id="displayUserDob" style="font-size: 12px; color: #00d2ff; font-weight: 600;"></p>
                     </div>
-
-                    <!-- Hidden Change Password Form -->
                     <div id="changePassForm" style="display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
                         <input type="password" id="newPasswordInput" class="auth-input" style="padding: 12px; font-size: 14px;" placeholder="Enter New Password">
                         <button class="auth-btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 12px; font-size: 14px;" onclick="confirmChangePassword()">Save Password</button>
                     </div>
-
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button class="auth-btn" style="background: linear-gradient(135deg, #0a84ff, #5e5ce6); box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);" onclick="toggleChangePassword()">Change Password</button>
                         <button class="auth-btn" style="background: linear-gradient(135deg, #ff9500, #ff5e3a); box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);" onclick="userLogout()">Log Out</button>
@@ -229,10 +240,7 @@
             </div>
         </div>
 
-        <!-- CUSTOM ALERT POPUP -->
         <div id="customAlert" class="modal-overlay" onclick="closeCustomAlert()"><div class="modal-box" onclick="event.stopPropagation()"><div class="alert-heading" id="alertTitle">Title</div><div class="alert-body" id="alertMessage">Message goes here.</div><button class="alert-ok-btn" onclick="closeCustomAlert()">Got it</button></div></div>
-        
-        <!-- TOAST MESSAGE -->
         <div id="toastMessage">Copied!</div>
 
     </div>
@@ -282,7 +290,6 @@
                 document.getElementById('displayUserEmail').innerText = user.email;
                 document.getElementById('changePassForm').style.display = 'none';
                 
-                // Fetch User Extra Data (Name, DOB)
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if(userDoc.exists()) {
@@ -302,12 +309,12 @@
         function renderData(query = '') {
             const allContainer = document.getElementById('allList'); const appsContainer = document.getElementById('appsList'); const filesContainer = document.getElementById('filesList');
             allContainer.innerHTML = ''; appsContainer.innerHTML = ''; filesContainer.innerHTML = '';
-            const filtered = window.allItems.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+            const filtered = window.allItems.filter(item => (item.name || "").toLowerCase().includes(query.toLowerCase()));
             let allCount = 0; let appsCount = 0; let filesCount = 0;
 
             filtered.forEach(item => {
-                const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner" style="width:50%; height:50%;">` : `<span class="item-icon-inner">${item.category === 'app' ? '📱' : '📁'}</span>`;
-                const html = `<div class="grid-item" onclick="openAppDetails('${item.id}')"><div class="item-icon">${iconHtml}</div><div class="item-name">${item.name}</div></div>`;
+                const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center;">${item.category === 'app' ? '📱' : '📁'}</span>`;
+                const html = `<div class="grid-item" onclick="openAppDetails('${item.id}')"><div class="item-icon">${iconHtml}</div><div class="item-name">${item.name || "Unnamed"}</div></div>`;
                 allContainer.innerHTML += html; allCount++;
                 if(item.category === 'app') { appsContainer.innerHTML += html; appsCount++; } else { filesContainer.innerHTML += html; filesCount++; }
             });
@@ -339,8 +346,8 @@
             const item = window.allItems.find(i => i.id === id);
             if(!item) return;
 
-            document.getElementById('detailTitle').innerText = item.name;
-            const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner" style="width:50%; height:50%;">` : `<span class="item-icon-inner">${item.category === 'app' ? '📱' : '📁'}</span>`;
+            document.getElementById('detailTitle').innerText = item.name || "Unnamed Item";
+            const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center;">${item.category === 'app' ? '📱' : '📁'}</span>`;
             document.getElementById('detailIconWrapper').innerHTML = iconHtml;
             
             const defaultAbout = item.category === 'app' ? `Premium secure application optimized for your device.` : `High quality secure file/document stored safely in the cloud.`;
@@ -379,13 +386,7 @@
         window.openMenuModal = function() { document.getElementById('menuModal').classList.add('show'); }
         window.openProfileModal = function() { document.getElementById('profileModal').classList.add('show'); switchAuthTab('login'); }
         window.closeModals = function() { document.getElementById('menuModal').classList.remove('show'); document.getElementById('profileModal').classList.remove('show'); document.getElementById('appDetailsModal').classList.remove('show'); }
-        
-        window.showCustomAlert = function(title, message) { 
-            closeModals(); 
-            document.getElementById('alertTitle').innerHTML = title; 
-            document.getElementById('alertMessage').innerHTML = message; 
-            document.getElementById('customAlert').classList.add('show'); 
-        }
+        window.showCustomAlert = function(title, message) { closeModals(); document.getElementById('alertTitle').innerHTML = title; document.getElementById('alertMessage').innerHTML = message; document.getElementById('customAlert').classList.add('show'); }
         window.closeCustomAlert = function() { document.getElementById('customAlert').classList.remove('show'); }
 
         window.showAboutAlert = function() { showCustomAlert('About App', window.globalSettings.about || "Version 1.0.0<br><br>Developed with extreme precision and premium UI by RVG."); }
@@ -400,8 +401,7 @@
             else if(tab === 'forgot') { document.getElementById('form-forgot').classList.add('active'); document.getElementById('authTabHeader').style.display = 'none'; }
         }
 
-        // ---------------- ACCOUNT MANAGEMENT ----------------
-
+        // ACCOUNT MANAGEMENT
         window.userSignUp = async function() {
             const name = document.getElementById('signupName').value.trim(); 
             const dob = document.getElementById('signupDob').value.trim(); 
@@ -452,11 +452,8 @@
                 document.getElementById('changePassForm').style.display = 'none';
                 showCustomAlert("Success", "Your password has been changed successfully.");
             } catch(error) {
-                if(error.code === 'auth/requires-recent-login') {
-                    showCustomAlert("Security Check", "Please log out and log in again to change your password.");
-                } else {
-                    showCustomAlert("Error", error.message);
-                }
+                if(error.code === 'auth/requires-recent-login') { showCustomAlert("Security Check", "Please log out and log in again to change your password."); } 
+                else { showCustomAlert("Error", error.message); }
             }
         }
 
@@ -464,20 +461,16 @@
             if(confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
                 try {
                     const user = auth.currentUser;
-                    await deleteDoc(doc(db, "users", user.uid)); // Delete from firestore
-                    await deleteUser(user); // Delete from Auth
+                    await deleteDoc(doc(db, "users", user.uid));
+                    await deleteUser(user);
                     showCustomAlert("Account Deleted", "Your account has been permanently removed.");
                     closeModals();
                 } catch(error) {
-                    if(error.code === 'auth/requires-recent-login') {
-                        showCustomAlert("Security Alert", "Please log out and log in again to delete your account.");
-                    } else {
-                        showCustomAlert("Error", error.message);
-                    }
+                    if(error.code === 'auth/requires-recent-login') { showCustomAlert("Security Alert", "Please log out and log in again to delete your account."); } 
+                    else { showCustomAlert("Error", error.message); }
                 }
             }
         }
-
     </script>
 </body>
 </html>
