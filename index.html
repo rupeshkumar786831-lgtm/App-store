@@ -49,7 +49,7 @@
         .grid-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; position: relative; cursor: pointer; }
         
-        /* 🔥 ULTRA 3D PREMIUM LIQUID ICONS 🔥 */
+        /* 🔥 APP SHAPE (Squircle iOS style) 🔥 */
         .item-icon { 
             width: 70px; height: 70px; border-radius: 24%; object-fit: cover; 
             background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 100%);
@@ -58,7 +58,12 @@
             border-bottom: 1.5px solid rgba(0, 0, 0, 0.8); border-right: 1.5px solid rgba(0, 0, 0, 0.5);
             box-shadow: -5px -5px 15px rgba(255, 255, 255, 0.05), 15px 15px 35px rgba(0, 0, 0, 0.9), inset 3px 3px 8px rgba(255, 255, 255, 0.5), inset -5px -5px 15px rgba(0, 0, 0, 0.6);   
             margin-bottom: 12px; display: flex; align-items: center; justify-content: center; 
-            color: rgba(255,255,255,0.9); font-size: 30px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; 
+            color: rgba(255,255,255,0.9); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; 
+        }
+
+        /* 🔥 FILE SHAPE (Folded Document style) 🔥 */
+        .file-shape {
+            border-radius: 10px 28px 10px 10px !important;
         }
         
         .item-icon-inner { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); width: 50%; height: 50%; border-radius: 8px; object-fit: cover; }
@@ -160,7 +165,8 @@
             <div class="modal-box" style="position: relative;" onclick="event.stopPropagation()">
                 <div class="close-btn-top" onclick="closeModals()">✕</div>
                 <div class="app-detail-header">
-                    <div id="detailIconWrapper" class="item-icon" style="width: 85px; height: 85px; font-size: 38px; margin: 0 auto 15px auto;"></div>
+                    <!-- Icon shape dynamically injected here -->
+                    <div id="detailIconWrapper" style="margin: 0 auto 15px auto;"></div>
                     <h2 id="detailTitle" style="font-weight: 800; font-size: 22px; letter-spacing: 0.5px;">App Name</h2>
                     <div class="rating-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span style="color: rgba(255,255,255,0.3)">★</span><span style="color: #fff; margin-left: 5px;">4.8</span></div>
                 </div>
@@ -173,7 +179,6 @@
                     <div class="detail-heading">About This Item</div>
                     <div id="detailAbout" class="detail-text"></div>
                     
-                    <!-- 🔥 FIXED: DOWNLOAD BUTTON (Ab <a> tag hai, block nahi hoga) 🔥 -->
                     <a id="detailDownloadBtn" class="auth-btn" href="#" target="_blank">Download Now</a>
                 </div>
             </div>
@@ -249,7 +254,7 @@
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -268,21 +273,21 @@
         window.allItems = []; window.globalSettings = { about: '', update: '', notice: '' };
         window.isUserLoggedIn = false; window.currentPasswordToCopy = "";
 
-        // Settings Listener
+        // Premium Default SVGs for App and File
+        const defaultAppIcon = `<svg viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,0.9)"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm-5 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.75-4H7.25V4h9.5v14z"/></svg>`;
+        const defaultFileIcon = `<svg viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,0.9)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+
         onSnapshot(doc(db, "settings", "global"), (docSnap) => { if(docSnap.exists()) window.globalSettings = docSnap.data(); });
 
-        // Store Items Listener + Remove Loader
         onSnapshot(collection(db, "storeItems"), (snapshot) => {
             window.allItems = [];
             snapshot.forEach((doc) => { window.allItems.push({ id: doc.id, ...doc.data() }); });
             window.allItems.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
             renderData(); 
-            
             const loader = document.getElementById('loaderOverlay');
             if(loader) { loader.classList.add('hidden'); }
         });
 
-        // Auth State Listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.isUserLoggedIn = true;
@@ -298,8 +303,7 @@
                         document.getElementById('displayUserName').innerText = ud.name || "Cloud User";
                         document.getElementById('displayUserDob').innerText = "DOB: " + (ud.dob ? new Date(ud.dob).toLocaleDateString('en-IN') : "Not provided");
                     }
-                } catch(e) { console.log("Could not fetch user profile details."); }
-
+                } catch(e) { console.log("Profile error"); }
             } else {
                 window.isUserLoggedIn = false;
                 document.getElementById('authContainer').style.display = 'block';
@@ -314,10 +318,16 @@
             let allCount = 0; let appsCount = 0; let filesCount = 0;
 
             filtered.forEach(item => {
-                const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center;">${item.category === 'app' ? '📱' : '📁'}</span>`;
-                const html = `<div class="grid-item" onclick="openAppDetails('${item.id}')"><div class="item-icon">${iconHtml}</div><div class="item-name">${item.name || "Unnamed"}</div></div>`;
+                const isApp = item.category === 'app';
+                const shapeClass = isApp ? '' : 'file-shape'; // File Shape Applied Here!
+                const defaultIcon = isApp ? defaultAppIcon : defaultFileIcon;
+                
+                const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center; width:100%; height:100%;">${defaultIcon}</span>`;
+                
+                const html = `<div class="grid-item" onclick="openAppDetails('${item.id}')"><div class="item-icon ${shapeClass}">${iconHtml}</div><div class="item-name">${item.name || "Unnamed"}</div></div>`;
+                
                 allContainer.innerHTML += html; allCount++;
-                if(item.category === 'app') { appsContainer.innerHTML += html; appsCount++; } else { filesContainer.innerHTML += html; filesCount++; }
+                if(isApp) { appsContainer.innerHTML += html; appsCount++; } else { filesContainer.innerHTML += html; filesCount++; }
             });
 
             if(allCount === 0) allContainer.innerHTML = `<div class="empty-state">No items available.</div>`;
@@ -327,12 +337,11 @@
 
         document.getElementById('globalSearch').addEventListener('input', (e) => { renderData(e.target.value); });
 
-        // 🔥 FIXED: DB Background Update Logic
         window.updateDownloadCount = function(itemId) {
             try {
                 const item = window.allItems.find(i => i.id === itemId);
                 if(item) { updateDoc(doc(db, "storeItems", itemId), { downloads: (item.downloads || 0) + 1 }); }
-            } catch (error) { console.error("Error updating download count:", error); }
+            } catch (error) { console.log(error); }
         }
 
         window.switchTab = function(tab) {
@@ -343,16 +352,22 @@
             else if(tab === 'files') { document.getElementById('filesScreen').classList.add('active'); document.querySelectorAll('.nav-item')[2].classList.add('active'); }
         };
 
-        // 🔥 FIXED: Link Tag Download Configuration
         window.openAppDetails = function(id) {
             const item = window.allItems.find(i => i.id === id);
             if(!item) return;
 
             document.getElementById('detailTitle').innerText = item.name || "Unnamed Item";
-            const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center;">${item.category === 'app' ? '📱' : '📁'}</span>`;
-            document.getElementById('detailIconWrapper').innerHTML = iconHtml;
             
-            const defaultAbout = item.category === 'app' ? `Premium secure application optimized for your device.` : `High quality secure file/document stored safely in the cloud.`;
+            const isApp = item.category === 'app';
+            const shapeClass = isApp ? '' : 'file-shape'; // File Shape Applied Here too!
+            const defaultIcon = isApp ? defaultAppIcon : defaultFileIcon;
+            const iconHtml = item.icon ? `<img src="${item.icon}" class="item-icon-inner">` : `<span class="item-icon-inner" style="display:flex;align-items:center;justify-content:center; width:100%; height:100%;">${defaultIcon}</span>`;
+            
+            const wrapper = document.getElementById('detailIconWrapper');
+            wrapper.className = 'item-icon ' + shapeClass;
+            wrapper.innerHTML = iconHtml;
+            
+            const defaultAbout = isApp ? `Premium secure application optimized for your device.` : `High quality secure file/document stored safely in the cloud.`;
             document.getElementById('detailAbout').innerText = item.about ? item.about : defaultAbout;
 
             if(item.password) {
@@ -361,7 +376,6 @@
                 window.currentPasswordToCopy = item.password;
             } else { document.getElementById('detailPasswordBox').style.display = 'none'; window.currentPasswordToCopy = ""; }
 
-            // Download Button Logic Update
             const downloadBtn = document.getElementById('detailDownloadBtn');
             downloadBtn.href = item.link || "#";
             
@@ -369,18 +383,15 @@
                 downloadBtn.innerHTML = '🔒 Download (Private)';
                 downloadBtn.onclick = function(e) {
                     if(!window.isUserLoggedIn) { 
-                        e.preventDefault(); // Rok do redirect
+                        e.preventDefault(); 
                         showCustomAlert('Access Denied', 'This is a private file. Please login to download it.'); 
                     } else {
-                        // Sahi hai, DB update karo background me
                         window.updateDownloadCount(item.id);
                     }
                 };
             } else {
                 downloadBtn.innerHTML = 'Download Now';
-                downloadBtn.onclick = function() { 
-                    window.updateDownloadCount(item.id); 
-                };
+                downloadBtn.onclick = function() { window.updateDownloadCount(item.id); };
             }
 
             closeModals(); document.getElementById('appDetailsModal').classList.add('show');
@@ -414,18 +425,12 @@
         }
 
         window.userSignUp = async function() {
-            const name = document.getElementById('signupName').value.trim(); 
-            const dob = document.getElementById('signupDob').value.trim(); 
-            const email = document.getElementById('signupEmail').value.trim(); 
-            const pass = document.getElementById('signupPass').value.trim();
-            
+            const name = document.getElementById('signupName').value.trim(); const dob = document.getElementById('signupDob').value.trim(); 
+            const email = document.getElementById('signupEmail').value.trim(); const pass = document.getElementById('signupPass').value.trim();
             if(!name || !email || !pass || !dob) return showCustomAlert("Error", "All fields including Date of Birth are required.");
-            
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", userCred.user.uid), { 
-                    name: name, dob: dob, email: email, createdAt: Date.now() 
-                });
+                await setDoc(doc(db, "users", userCred.user.uid), { name: name, dob: dob, email: email, createdAt: Date.now() });
                 showCustomAlert("Welcome!", "Account created successfully.");
                 document.getElementById('signupName').value = ''; document.getElementById('signupDob').value = ''; 
                 document.getElementById('signupEmail').value = ''; document.getElementById('signupPass').value = '';
@@ -444,23 +449,18 @@
             try { await sendPasswordResetEmail(auth, email); showCustomAlert("Email Sent", "Password reset link has been sent to your email."); document.getElementById('forgotEmail').value = ''; } catch(e) { showCustomAlert("Error", e.message); }
         }
 
-        window.userLogout = async function() { 
-            try { await signOut(auth); closeModals(); } catch(e) { showCustomAlert("Error", e.message); } 
-        }
+        window.userLogout = async function() { try { await signOut(auth); closeModals(); } catch(e) { showCustomAlert("Error", e.message); } }
 
         window.toggleChangePassword = function() {
-            const form = document.getElementById('changePassForm');
-            form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+            const form = document.getElementById('changePassForm'); form.style.display = form.style.display === 'none' ? 'flex' : 'none';
         }
 
         window.confirmChangePassword = async function() {
             const newPass = document.getElementById('newPasswordInput').value.trim();
             if(!newPass || newPass.length < 6) return showCustomAlert("Error", "Password must be at least 6 characters.");
-            
             try {
                 await updatePassword(auth.currentUser, newPass);
-                document.getElementById('newPasswordInput').value = '';
-                document.getElementById('changePassForm').style.display = 'none';
+                document.getElementById('newPasswordInput').value = ''; document.getElementById('changePassForm').style.display = 'none';
                 showCustomAlert("Success", "Your password has been changed successfully.");
             } catch(error) {
                 if(error.code === 'auth/requires-recent-login') { showCustomAlert("Security Check", "Please log out and log in again to change your password."); } 
@@ -474,8 +474,7 @@
                     const user = auth.currentUser;
                     await deleteDoc(doc(db, "users", user.uid));
                     await deleteUser(user);
-                    showCustomAlert("Account Deleted", "Your account has been permanently removed.");
-                    closeModals();
+                    showCustomAlert("Account Deleted", "Your account has been permanently removed."); closeModals();
                 } catch(error) {
                     if(error.code === 'auth/requires-recent-login') { showCustomAlert("Security Alert", "Please log out and log in again to delete your account."); } 
                     else { showCustomAlert("Error", error.message); }
@@ -485,4 +484,4 @@
 
     </script>
 </body>
-                                                                                                                                              </html>
+</html>
